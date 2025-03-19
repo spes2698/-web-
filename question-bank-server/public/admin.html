@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库系统 - 管理员控制台</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">题库系统</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            首页
+                        </a>
+                        <a href="/admin.html" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            管理控制台
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="logout" class="ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        退出登录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <!-- 系统概览 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">系统概览</h2>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">总用户数</div>
+                        <div class="mt-1 text-2xl font-semibold text-gray-900" id="totalUsers">0</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">总题目数</div>
+                        <div class="mt-1 text-2xl font-semibold text-gray-900" id="totalQuestions">0</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">今日答题数</div>
+                        <div class="mt-1 text-2xl font-semibold text-gray-900" id="todayAnswers">0</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">系统负载</div>
+                        <div class="mt-1 text-2xl font-semibold text-gray-900" id="systemLoad">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户管理 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-medium text-gray-900">用户管理</h2>
+                    <button id="addUser" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        添加用户
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    手机号码
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    角色
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    注册时间
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    状态
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    操作
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList" class="bg-white divide-y divide-gray-200">
+                            <!-- 用户列表将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button id="prevUserPageMobile" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            上一页
+                        </button>
+                        <button id="nextUserPageMobile" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            下一页
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                显示第 <span id="userStartIndex">0</span> 到 <span id="userEndIndex">0</span> 条记录，共 <span id="userTotalItems">0</span> 条
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <button id="prevUserPage" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">上一页</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button id="nextUserPage" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">下一页</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 题目管理 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-medium text-gray-900">题目管理</h2>
+                    <button id="addQuestion" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        添加题目
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    标题
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    分类
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    难度
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    使用次数
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    正确率
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    操作
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionList" class="bg-white divide-y divide-gray-200">
+                            <!-- 题目列表将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button id="prevQuestionPageMobile" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            上一页
+                        </button>
+                        <button id="nextQuestionPageMobile" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            下一页
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                显示第 <span id="questionStartIndex">0</span> 到 <span id="questionEndIndex">0</span> 条记录，共 <span id="questionTotalItems">0</span> 条
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <button id="prevQuestionPage" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">上一页</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button id="nextQuestionPage" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">下一页</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系统设置 -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">系统设置</h2>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="smsAccessKey" class="block text-sm font-medium text-gray-700">短信服务AccessKey</label>
+                        <input type="text" id="smsAccessKey" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="smsSecretKey" class="block text-sm font-medium text-gray-700">短信服务SecretKey</label>
+                        <input type="password" id="smsSecretKey" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="wechatAppId" class="block text-sm font-medium text-gray-700">微信AppID</label>
+                        <input type="text" id="wechatAppId" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="wechatAppSecret" class="block text-sm font-medium text-gray-700">微信AppSecret</label>
+                        <input type="password" id="wechatAppSecret" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="qqAppId" class="block text-sm font-medium text-gray-700">QQ AppID</label>
+                        <input type="text" id="qqAppId" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="qqAppKey" class="block text-sm font-medium text-gray-700">QQ AppKey</label>
+                        <input type="password" id="qqAppKey" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="saveSettings" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        保存设置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 添加用户模态框 -->
+    <div id="addUserModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                添加用户
+                            </h3>
+                            <div class="mt-4">
+                                <div class="mb-4">
+                                    <label for="userPhone" class="block text-sm font-medium text-gray-700">手机号码</label>
+                                    <input type="tel" id="userPhone" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="userRole" class="block text-sm font-medium text-gray-700">用户角色</label>
+                                    <select id="userRole" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                        <option value="user">普通用户</option>
+                                        <option value="admin">管理员</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmAddUser" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        确认添加
+                    </button>
+                    <button type="button" id="cancelAddUser" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加题目模态框 -->
+    <div id="addQuestionModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                添加题目
+                            </h3>
+                            <div class="mt-4">
+                                <div class="mb-4">
+                                    <label for="questionTitle" class="block text-sm font-medium text-gray-700">题目标题</label>
+                                    <input type="text" id="questionTitle" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="questionContent" class="block text-sm font-medium text-gray-700">题目内容</label>
+                                    <textarea id="questionContent" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="questionAnswer" class="block text-sm font-medium text-gray-700">正确答案</label>
+                                    <textarea id="questionAnswer" rows="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="questionAnalysis" class="block text-sm font-medium text-gray-700">题目解析</label>
+                                    <textarea id="questionAnalysis" rows="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="questionCategory" class="block text-sm font-medium text-gray-700">题目分类</label>
+                                    <select id="questionCategory" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                        <!-- 分类选项将通过JavaScript动态添加 -->
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="questionDifficulty" class="block text-sm font-medium text-gray-700">难度</label>
+                                    <select id="questionDifficulty" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                        <option value="easy">简单</option>
+                                        <option value="medium">中等</option>
+                                        <option value="hard">困难</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmAddQuestion" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        确认添加
+                    </button>
+                    <button type="button" id="cancelAddQuestion" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检查登录状态和权限
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/index.html';
+        }
+
+        // 全局变量
+        let currentUserPage = 1;
+        let currentQuestionPage = 1;
+        let pageSize = 10;
+        let userTotalPages = 1;
+        let questionTotalPages = 1;
+        let userTotalItems = 0;
+        let questionTotalItems = 0;
+
+        // 获取系统概览数据
+        async function fetchOverview() {
+            try {
+                const response = await fetch('/api/admin/overview', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const overview = data.data;
+                    document.getElementById('totalUsers').textContent = overview.totalUsers;
+                    document.getElementById('totalQuestions').textContent = overview.totalQuestions;
+                    document.getElementById('todayAnswers').textContent = overview.todayAnswers;
+                    document.getElementById('systemLoad').textContent = `${overview.systemLoad}%`;
+                }
+            } catch (error) {
+                console.error('获取系统概览失败:', error);
+            }
+        }
+
+        // 获取用户列表
+        async function fetchUsers() {
+            try {
+                const response = await fetch(`/api/admin/users?page=${currentUserPage}&pageSize=${pageSize}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const { users, total } = data.data;
+                    userTotalItems = total;
+                    userTotalPages = Math.ceil(total / pageSize);
+                    renderUserList(users);
+                    updateUserPagination();
+                }
+            } catch (error) {
+                console.error('获取用户列表失败:', error);
+            }
+        }
+
+        // 渲染用户列表
+        function renderUserList(users) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = users.map(user => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${user.phone}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${user.role === 'admin' ? '管理员' : '普通用户'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(user.createdAt).toLocaleString()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${user.status === 'active' ? '正常' : '禁用'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-indigo-600 hover:text-indigo-900 mr-3" onclick="editUser('${user._id}')">
+                            编辑
+                        </button>
+                        <button class="text-red-600 hover:text-red-900" onclick="deleteUser('${user._id}')">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 更新用户分页信息
+        function updateUserPagination() {
+            const startIndex = (currentUserPage - 1) * pageSize + 1;
+            const endIndex = Math.min(startIndex + pageSize - 1, userTotalItems);
+            
+            document.getElementById('userStartIndex').textContent = startIndex;
+            document.getElementById('userEndIndex').textContent = endIndex;
+            document.getElementById('userTotalItems').textContent = userTotalItems;
+            
+            document.getElementById('prevUserPage').disabled = currentUserPage === 1;
+            document.getElementById('nextUserPage').disabled = currentUserPage === userTotalPages;
+            document.getElementById('prevUserPageMobile').disabled = currentUserPage === 1;
+            document.getElementById('nextUserPageMobile').disabled = currentUserPage === userTotalPages;
+        }
+
+        // 获取题目列表
+        async function fetchQuestions() {
+            try {
+                const response = await fetch(`/api/admin/questions?page=${currentQuestionPage}&pageSize=${pageSize}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const { questions, total } = data.data;
+                    questionTotalItems = total;
+                    questionTotalPages = Math.ceil(total / pageSize);
+                    renderQuestionList(questions);
+                    updateQuestionPagination();
+                }
+            } catch (error) {
+                console.error('获取题目列表失败:', error);
+            }
+        }
+
+        // 渲染题目列表
+        function renderQuestionList(questions) {
+            const questionList = document.getElementById('questionList');
+            questionList.innerHTML = questions.map(question => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${question.title}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${question.category ? question.category.name : '未分类'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${question.difficulty === 'easy' ? '简单' : question.difficulty === 'medium' ? '中等' : '困难'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${question.usageCount}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${(question.correctRate * 100).toFixed(1)}%
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-indigo-600 hover:text-indigo-900 mr-3" onclick="editQuestion('${question._id}')">
+                            编辑
+                        </button>
+                        <button class="text-red-600 hover:text-red-900" onclick="deleteQuestion('${question._id}')">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 更新题目分页信息
+        function updateQuestionPagination() {
+            const startIndex = (currentQuestionPage - 1) * pageSize + 1;
+            const endIndex = Math.min(startIndex + pageSize - 1, questionTotalItems);
+            
+            document.getElementById('questionStartIndex').textContent = startIndex;
+            document.getElementById('questionEndIndex').textContent = endIndex;
+            document.getElementById('questionTotalItems').textContent = questionTotalItems;
+            
+            document.getElementById('prevQuestionPage').disabled = currentQuestionPage === 1;
+            document.getElementById('nextQuestionPage').disabled = currentQuestionPage === questionTotalPages;
+            document.getElementById('prevQuestionPageMobile').disabled = currentQuestionPage === 1;
+            document.getElementById('nextQuestionPageMobile').disabled = currentQuestionPage === questionTotalPages;
+        }
+
+        // 获取系统设置
+        async function fetchSettings() {
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const settings = data.data;
+                    document.getElementById('smsAccessKey').value = settings.sms.accessKey;
+                    document.getElementById('smsSecretKey').value = settings.sms.secretKey;
+                    document.getElementById('wechatAppId').value = settings.wechat.appId;
+                    document.getElementById('wechatAppSecret').value = settings.wechat.appSecret;
+                    document.getElementById('qqAppId').value = settings.qq.appId;
+                    document.getElementById('qqAppKey').value = settings.qq.appKey;
+                }
+            } catch (error) {
+                console.error('获取系统设置失败:', error);
+            }
+        }
+
+        // 保存系统设置
+        async function saveSettings() {
+            const settings = {
+                sms: {
+                    accessKey: document.getElementById('smsAccessKey').value,
+                    secretKey: document.getElementById('smsSecretKey').value
+                },
+                wechat: {
+                    appId: document.getElementById('wechatAppId').value,
+                    appSecret: document.getElementById('wechatAppSecret').value
+                },
+                qq: {
+                    appId: document.getElementById('qqAppId').value,
+                    appKey: document.getElementById('qqAppKey').value
+                }
+            };
+
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('设置保存成功');
+                }
+            } catch (error) {
+                console.error('保存系统设置失败:', error);
+                alert('设置保存失败');
+            }
+        }
+
+        // 事件监听
+        document.getElementById('addUser').addEventListener('click', () => {
+            document.getElementById('addUserModal').classList.remove('hidden');
+        });
+        document.getElementById('cancelAddUser').addEventListener('click', () => {
+            document.getElementById('addUserModal').classList.add('hidden');
+        });
+        document.getElementById('confirmAddUser').addEventListener('click', async () => {
+            const phone = document.getElementById('userPhone').value;
+            const role = document.getElementById('userRole').value;
+
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone, role })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('addUserModal').classList.add('hidden');
+                    fetchUsers();
+                }
+            } catch (error) {
+                console.error('添加用户失败:', error);
+            }
+        });
+
+        document.getElementById('addQuestion').addEventListener('click', () => {
+            document.getElementById('addQuestionModal').classList.remove('hidden');
+        });
+        document.getElementById('cancelAddQuestion').addEventListener('click', () => {
+            document.getElementById('addQuestionModal').classList.add('hidden');
+        });
+        document.getElementById('confirmAddQuestion').addEventListener('click', async () => {
+            const question = {
+                title: document.getElementById('questionTitle').value,
+                content: document.getElementById('questionContent').value,
+                answer: document.getElementById('questionAnswer').value,
+                analysis: document.getElementById('questionAnalysis').value,
+                category: document.getElementById('questionCategory').value,
+                difficulty: document.getElementById('questionDifficulty').value
+            };
+
+            try {
+                const response = await fetch('/api/admin/questions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(question)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('addQuestionModal').classList.add('hidden');
+                    fetchQuestions();
+                }
+            } catch (error) {
+                console.error('添加题目失败:', error);
+            }
+        });
+
+        document.getElementById('saveSettings').addEventListener('click', saveSettings);
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+        });
+
+        // 用户分页事件
+        document.getElementById('prevUserPage').addEventListener('click', () => {
+            if (currentUserPage > 1) {
+                currentUserPage--;
+                fetchUsers();
+            }
+        });
+        document.getElementById('nextUserPage').addEventListener('click', () => {
+            if (currentUserPage < userTotalPages) {
+                currentUserPage++;
+                fetchUsers();
+            }
+        });
+        document.getElementById('prevUserPageMobile').addEventListener('click', () => {
+            if (currentUserPage > 1) {
+                currentUserPage--;
+                fetchUsers();
+            }
+        });
+        document.getElementById('nextUserPageMobile').addEventListener('click', () => {
+            if (currentUserPage < userTotalPages) {
+                currentUserPage++;
+                fetchUsers();
+            }
+        });
+
+        // 题目分页事件
+        document.getElementById('prevQuestionPage').addEventListener('click', () => {
+            if (currentQuestionPage > 1) {
+                currentQuestionPage--;
+                fetchQuestions();
+            }
+        });
+        document.getElementById('nextQuestionPage').addEventListener('click', () => {
+            if (currentQuestionPage < questionTotalPages) {
+                currentQuestionPage++;
+                fetchQuestions();
+            }
+        });
+        document.getElementById('prevQuestionPageMobile').addEventListener('click', () => {
+            if (currentQuestionPage > 1) {
+                currentQuestionPage--;
+                fetchQuestions();
+            }
+        });
+        document.getElementById('nextQuestionPageMobile').addEventListener('click', () => {
+            if (currentQuestionPage < questionTotalPages) {
+                currentQuestionPage++;
+                fetchQuestions();
+            }
+        });
+
+        // 页面加载时获取数据
+        fetchOverview();
+        fetchUsers();
+        fetchQuestions();
+        fetchSettings();
+    </script>
+</body>
+</html> 

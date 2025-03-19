@@ -1,0 +1,132 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 布局样式 */
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  height: 64px;
+}
+
+.logo {
+  margin-right: 48px;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4A90E2;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.logo a:hover {
+  color: #357ABD;
+}
+
+.nav-menu {
+  flex: 1;
+  border: none;
+  background: transparent;
+}
+
+.app-content {
+  padding: 88px 24px 24px;
+  background: #F8F9FA;
+  min-height: 100vh;
+}
+
+/* 卡片样式 */
+.ant-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.ant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* 渐变背景卡片 */
+.gradient-card {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: white;
+}
+
+.gradient-card-warm {
+  background: linear-gradient(135deg, #FF9B9B 0%, #FF6B6B 100%);
+  color: white;
+}
+
+.gradient-card-cool {
+  background: linear-gradient(135deg, #4ECDC4 0%, #45B7AF 100%);
+  color: white;
+}
+
+/* 按钮样式 */
+.ant-btn {
+  border-radius: 6px;
+  height: 40px;
+  padding: 0 20px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.ant-btn-primary {
+  background: #4A90E2;
+  border-color: #4A90E2;
+}
+
+.ant-btn-primary:hover {
+  background: #357ABD;
+  border-color: #357ABD;
+}
+
+/* 进度条样式 */
+.ant-progress-text {
+  font-size: 1rem !important;
+  font-weight: 500;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .logo {
+    margin-right: 24px;
+  }
+
+  .app-content {
+    padding: 88px 16px 16px;
+  }
+
+  .ant-col {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}

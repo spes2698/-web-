@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库系统 - 答题练习</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">题库系统</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            首页
+                        </a>
+                        <a href="/practice.html" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            答题练习
+                        </a>
+                        <a href="/history.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            答题历史
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="logout" class="ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        退出登录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <!-- 练习设置 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">练习设置</h2>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">题目分类</label>
+                        <select id="category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">所有分类</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="difficulty" class="block text-sm font-medium text-gray-700">难度</label>
+                        <select id="difficulty" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">所有难度</option>
+                            <option value="easy">简单</option>
+                            <option value="medium">中等</option>
+                            <option value="hard">困难</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="questionCount" class="block text-sm font-medium text-gray-700">题目数量</label>
+                        <select id="questionCount" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="10">10题</option>
+                            <option value="20">20题</option>
+                            <option value="30">30题</option>
+                            <option value="50">50题</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="startPractice" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        开始练习
+                    </button>
+                </div>
+            </div>
+
+            <!-- 答题区域 -->
+            <div id="practiceArea" class="hidden">
+                <div class="bg-white shadow rounded-lg p-6">
+                    <!-- 进度条 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">进度</span>
+                            <span class="text-sm font-medium text-gray-700" id="progressText">0/0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 题目内容 -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2" id="questionTitle"></h3>
+                        <div class="prose max-w-none" id="questionContent"></div>
+                    </div>
+
+                    <!-- 答题区域 -->
+                    <div class="mb-6">
+                        <label for="answer" class="block text-sm font-medium text-gray-700 mb-2">你的答案</label>
+                        <textarea id="answer" rows="4" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="flex justify-between">
+                        <button id="prevQuestion" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            上一题
+                        </button>
+                        <button id="nextQuestion" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            下一题
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 答题结果 -->
+                <div id="resultArea" class="hidden mt-6">
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">练习结果</h2>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-500">总题数</div>
+                                <div class="mt-1 text-2xl font-semibold text-gray-900" id="totalQuestions">0</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-500">正确题数</div>
+                                <div class="mt-1 text-2xl font-semibold text-green-600" id="correctQuestions">0</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm font-medium text-gray-500">正确率</div>
+                                <div class="mt-1 text-2xl font-semibold text-indigo-600" id="correctRate">0%</div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button id="reviewAnswers" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                查看解析
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 解析模态框 -->
+    <div id="analysisModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                题目解析
+                            </h3>
+                            <div class="mt-4">
+                                <div class="mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700">正确答案</h4>
+                                    <div class="mt-1 text-sm text-gray-900" id="correctAnswer"></div>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700">解析</h4>
+                                    <div class="mt-1 text-sm text-gray-900" id="analysis"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="closeAnalysis" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检查登录状态
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/index.html';
+        }
+
+        // 全局变量
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let practiceId = null;
+
+        // 获取分类列表
+        async function fetchCategories() {
+            try {
+                const response = await fetch('/api/categories', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const categories = data.data.categories;
+                    const categorySelect = document.getElementById('category');
+                    categorySelect.innerHTML = `
+                        <option value="">所有分类</option>
+                        ${categories.map(category => `
+                            <option value="${category._id}">${category.name}</option>
+                        `).join('')}
+                    `;
+                }
+            } catch (error) {
+                console.error('获取分类列表失败:', error);
+            }
+        }
+
+        // 开始练习
+        async function startPractice() {
+            const category = document.getElementById('category').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const questionCount = document.getElementById('questionCount').value;
+
+            try {
+                const response = await fetch('/api/practice/start', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        category,
+                        difficulty,
+                        questionCount: parseInt(questionCount)
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    questions = data.data.questions;
+                    practiceId = data.data.practiceId;
+                    userAnswers = new Array(questions.length).fill('');
+                    currentQuestionIndex = 0;
+                    showQuestion();
+                    document.getElementById('practiceArea').classList.remove('hidden');
+                    document.getElementById('resultArea').classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('开始练习失败:', error);
+            }
+        }
+
+        // 显示题目
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionTitle').textContent = question.title;
+            document.getElementById('questionContent').innerHTML = question.content;
+            document.getElementById('answer').value = userAnswers[currentQuestionIndex];
+            updateProgress();
+            updateNavigationButtons();
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${currentQuestionIndex + 1}/${questions.length}`;
+        }
+
+        // 更新导航按钮状态
+        function updateNavigationButtons() {
+            document.getElementById('prevQuestion').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextQuestion').textContent = 
+                currentQuestionIndex === questions.length - 1 ? '提交' : '下一题';
+        }
+
+        // 保存答案
+        function saveAnswer() {
+            userAnswers[currentQuestionIndex] = document.getElementById('answer').value;
+        }
+
+        // 上一题
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        // 下一题
+        function nextQuestion() {
+            saveAnswer();
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                submitPractice();
+            }
+        }
+
+        // 提交练习
+        async function submitPractice() {
+            try {
+                const response = await fetch('/api/practice/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        practiceId,
+                        answers: userAnswers
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showResults(data.data);
+                }
+            } catch (error) {
+                console.error('提交练习失败:', error);
+            }
+        }
+
+        // 显示结果
+        function showResults(results) {
+            document.getElementById('totalQuestions').textContent = results.totalQuestions;
+            document.getElementById('correctQuestions').textContent = results.correctQuestions;
+            document.getElementById('correctRate').textContent = `${(results.correctRate * 100).toFixed(1)}%`;
+            document.getElementById('resultArea').classList.remove('hidden');
+        }
+
+        // 显示解析
+        function showAnalysis(question) {
+            document.getElementById('correctAnswer').textContent = question.answer;
+            document.getElementById('analysis').textContent = question.analysis;
+            document.getElementById('analysisModal').classList.remove('hidden');
+        }
+
+        // 事件监听
+        document.getElementById('startPractice').addEventListener('click', startPractice);
+        document.getElementById('prevQuestion').addEventListener('click', prevQuestion);
+        document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
+        document.getElementById('reviewAnswers').addEventListener('click', () => {
+            const question = questions[currentQuestionIndex];
+            showAnalysis(question);
+        });
+        document.getElementById('closeAnalysis').addEventListener('click', () => {
+            document.getElementById('analysisModal').classList.add('hidden');
+        });
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+        });
+
+        // 页面加载时获取数据
+        fetchCategories();
+    </script>
+</body>
+</html> 

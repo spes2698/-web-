@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    题库系统
+                </h2>
+            </div>
+            <div class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="phone" class="sr-only">手机号</label>
+                        <input id="phone" name="phone" type="tel" required 
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                            placeholder="手机号">
+                    </div>
+                    <div>
+                        <label for="code" class="sr-only">验证码</label>
+                        <div class="flex">
+                            <input id="code" name="code" type="text" required 
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                                placeholder="验证码">
+                            <button id="sendCode" 
+                                class="ml-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                发送验证码
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button id="login" 
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        登录
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="wechatLogin" 
+                            class="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 0C4.477 0 0 4.477 0 10c0 5.524 4.477 10 10 10s10-4.477 10-10c0-5.524-4.477-10-10-10zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+                            </svg>
+                            微信登录
+                        </button>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="qqLogin" 
+                            class="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 0C4.477 0 0 4.477 0 10c0 5.524 4.477 10 10 10s10-4.477 10-10c0-5.524-4.477-10-10-10zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+                            </svg>
+                            QQ登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sendCode').addEventListener('click', async () => {
+            const phone = document.getElementById('phone').value;
+            try {
+                const response = await fetch('/api/auth/send-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('验证码已发送');
+                } else {
+                    alert(data.message || '发送失败');
+                }
+            } catch (error) {
+                alert('发送失败');
+            }
+        });
+
+        document.getElementById('login').addEventListener('click', async () => {
+            const phone = document.getElementById('phone').value;
+            const code = document.getElementById('code').value;
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone, code })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('token', data.data.token);
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert(data.message || '登录失败');
+                }
+            } catch (error) {
+                alert('登录失败');
+            }
+        });
+
+        document.getElementById('wechatLogin').addEventListener('click', () => {
+            window.location.href = '/api/auth/wechat';
+        });
+
+        document.getElementById('qqLogin').addEventListener('click', () => {
+            window.location.href = '/api/auth/qq';
+        });
+    </script>
+</body>
+</html> 

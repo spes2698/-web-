@@ -1,0 +1,92 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #1890ff;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.code-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.code-input-group .ant-input {
+  flex: 1;
+}
+
+.code-input-group .ant-btn {
+  width: 120px;
+  white-space: nowrap;
+}
+
+.third-party-login {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.third-party-login .ant-btn {
+  width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+
+.wechat-btn {
+  background-color: #07c160;
+  border-color: #07c160;
+  color: white;
+}
+
+.wechat-btn:hover {
+  background-color: #06ae56;
+  border-color: #06ae56;
+}
+
+.qq-btn {
+  background-color: #12b7f5;
+  border-color: #12b7f5;
+  color: white;
+}
+
+.qq-btn:hover {
+  background-color: #0ea2e4;
+  border-color: #0ea2e4;
+}
+
+.ant-divider {
+  color: #999;
+  font-size: 14px;
+}
+
+.ant-form-item-label > label {
+  font-weight: 500;
+}
+
+.ant-input-affix-wrapper {
+  border-radius: 4px;
+}
+
+.ant-btn-primary {
+  height: 40px;
+  border-radius: 4px;
+} 

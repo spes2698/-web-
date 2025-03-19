@@ -1,0 +1,67 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.welcome-section h2 {
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  border: none;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card .ant-statistic-title {
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.stat-card .ant-statistic-content {
+  font-size: 2rem;
+}
+
+.section-title {
+  position: relative;
+  padding-left: 16px;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: #4A90E2;
+  border-radius: 2px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 16px;
+  }
+
+  .welcome-section {
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    height: 120px;
+  }
+
+  .stat-card .ant-statistic-content {
+    font-size: 1.5rem;
+  }
+} 

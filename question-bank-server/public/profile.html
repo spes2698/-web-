@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库系统 - 个人中心</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">题库系统</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            首页
+                        </a>
+                        <a href="/practice.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            答题练习
+                        </a>
+                        <a href="/history.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            答题历史
+                        </a>
+                        <a href="/profile.html" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            个人中心
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="logout" class="ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        退出登录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <!-- 个人信息 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">个人信息</h2>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">手机号码</label>
+                        <div class="mt-1 text-sm text-gray-900" id="phone"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">注册时间</label>
+                        <div class="mt-1 text-sm text-gray-900" id="createdAt"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">最后登录</label>
+                        <div class="mt-1 text-sm text-gray-900" id="lastLoginAt"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">用户角色</label>
+                        <div class="mt-1 text-sm text-gray-900" id="role"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习统计 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">学习统计</h2>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">总答题数</div>
+                        <div class="mt-1 text-2xl font-semibold text-gray-900" id="totalAnswers">0</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">正确题数</div>
+                        <div class="mt-1 text-2xl font-semibold text-green-600" id="correctAnswers">0</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm font-medium text-gray-500">正确率</div>
+                        <div class="mt-1 text-2xl font-semibold text-indigo-600" id="correctRate">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习趋势 -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">学习趋势</h2>
+                <div class="h-64" id="trendChart"></div>
+            </div>
+
+            <!-- 错题分布 -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">错题分布</h2>
+                <div class="h-64" id="wrongQuestionsChart"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script>
+        // 检查登录状态
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/index.html';
+        }
+
+        // 获取用户信息
+        async function fetchUserInfo() {
+            try {
+                const response = await fetch('/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const user = data.data;
+                    document.getElementById('phone').textContent = user.phone;
+                    document.getElementById('createdAt').textContent = new Date(user.createdAt).toLocaleString();
+                    document.getElementById('lastLoginAt').textContent = new Date(user.lastLoginAt).toLocaleString();
+                    document.getElementById('role').textContent = user.role === 'admin' ? '管理员' : '普通用户';
+                }
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+            }
+        }
+
+        // 获取学习统计
+        async function fetchStatistics() {
+            try {
+                const response = await fetch('/api/users/statistics', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const stats = data.data;
+                    document.getElementById('totalAnswers').textContent = stats.totalAnswers;
+                    document.getElementById('correctAnswers').textContent = stats.correctAnswers;
+                    document.getElementById('correctRate').textContent = `${(stats.correctRate * 100).toFixed(1)}%`;
+                    
+                    // 渲染学习趋势图
+                    renderTrendChart(stats.trend);
+                    // 渲染错题分布图
+                    renderWrongQuestionsChart(stats.wrongQuestions);
+                }
+            } catch (error) {
+                console.error('获取学习统计失败:', error);
+            }
+        }
+
+        // 渲染学习趋势图
+        function renderTrendChart(trend) {
+            const chart = echarts.init(document.getElementById('trendChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['答题数', '正确数']
+                },
+                xAxis: {
+                    type: 'category',
+                    data: trend.map(item => item.date)
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '答题数',
+                        type: 'line',
+                        data: trend.map(item => item.total)
+                    },
+                    {
+                        name: '正确数',
+                        type: 'line',
+                        data: trend.map(item => item.correct)
+                    }
+                ]
+            };
+            chart.setOption(option);
+        }
+
+        // 渲染错题分布图
+        function renderWrongQuestionsChart(wrongQuestions) {
+            const chart = echarts.init(document.getElementById('wrongQuestionsChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '错题分布',
+                        type: 'pie',
+                        radius: '50%',
+                        data: wrongQuestions.map(item => ({
+                            name: item.category,
+                            value: item.count
+                        })),
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            chart.setOption(option);
+        }
+
+        // 事件监听
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+        });
+
+        // 页面加载时获取数据
+        fetchUserInfo();
+        fetchStatistics();
+
+        // 监听窗口大小变化，重绘图表
+        window.addEventListener('resize', () => {
+            const trendChart = echarts.getInstanceByDom(document.getElementById('trendChart'));
+            const wrongQuestionsChart = echarts.getInstanceByDom(document.getElementById('wrongQuestionsChart'));
+            if (trendChart) trendChart.resize();
+            if (wrongQuestionsChart) wrongQuestionsChart.resize();
+        });
+    </script>
+</body>
+</html> 
