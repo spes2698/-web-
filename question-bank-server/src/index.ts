@@ -7,7 +7,7 @@ import { config } from './config';
 import { errorHandler } from './middlewares/error';
 import authRoutes from './routes/auth';
 import logger from './utils/logger';
-import { app } from './app';
+import healthRouter from './routes/health';
 
 const app = express();
 
@@ -18,6 +18,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // 路由
+app.use('/', healthRouter);
 app.use('/api/auth', authRoutes);
 
 // 错误处理

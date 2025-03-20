@@ -11,6 +11,7 @@ import questionRoutes from './routes/question.routes';
 import categoryRoutes from './routes/category.routes';
 import tagRoutes from './routes/tag.routes';
 import statisticsRoutes from './routes/statistics.routes';
+import healthRouter from './routes/health';
 
 // 创建Express应用
 const app = express();
@@ -34,6 +35,7 @@ app.use(express.json()); // 解析JSON
 app.use(express.urlencoded({ extended: true })); // 解析URL编码
 
 // 路由
+app.use('/', healthRouter);
 app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/categories', categoryRoutes);

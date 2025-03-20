@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConfigProvider, Layout, Menu } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import { BookOutlined, HistoryOutlined, UserOutlined, HomeOutlined } from '@ant-design/icons';
+import { BookOutlined, HistoryOutlined, UserOutlined, HomeOutlined, BarChartOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import Home from './pages/Home';
 import QuestionBanks from './pages/QuestionBanks';
 import Practice from './pages/Practice';
+import UserProfile from './pages/UserProfile';
+import Statistics from './pages/Statistics';
 import './App.css';
 
 const { Header, Content } = Layout;
@@ -38,6 +40,9 @@ function App() {
               <Menu.Item key="history" icon={<HistoryOutlined />}>
                 <Link to="/history">历史</Link>
               </Menu.Item>
+              <Menu.Item key="statistics" icon={<BarChartOutlined />}>
+                <Link to="/statistics">统计</Link>
+              </Menu.Item>
               <Menu.Item key="profile" icon={<UserOutlined />}>
                 <Link to="/profile">我的</Link>
               </Menu.Item>
@@ -48,6 +53,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/question-banks" element={<QuestionBanks />} />
               <Route path="/practice/:id" element={<Practice />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/statistics" element={<Statistics />} />
             </Routes>
           </Content>
         </Layout>

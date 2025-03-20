@@ -4,17 +4,43 @@ import { IThirdPartyAccount } from './third-party-account';
 
 export interface IUser extends Document {
   phone: string;
+  email?: string;
   nickname?: string;
   avatar?: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'teacher' | 'student';
+  permissions: string[];
   password?: string;
   thirdPartyAccounts?: IThirdPartyAccount[];
-  answerCount: number;
-  correctCount: number;
+  profile: {
+    realName?: string;
+    gender?: 'male' | 'female' | 'other';
+    birthday?: Date;
+    location?: string;
+    bio?: string;
+    education?: string;
+    organization?: string;
+  };
+  stats: {
+    answerCount: number;
+    correctCount: number;
+    totalTime: number;
+    lastPracticeAt?: Date;
+    favoriteQuestions: mongoose.Types.ObjectId[];
+    wrongQuestions: mongoose.Types.ObjectId[];
+  };
+  preferences: {
+    questionTypes: string[];
+    difficulty: 'easy' | 'medium' | 'hard';
+    dailyGoal: number;
+    emailNotification: boolean;
+    pushNotification: boolean;
+  };
+  groups: mongoose.Types.ObjectId[];
   lastLoginAt: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
+  hasPermission(permission: string): boolean;
 }
 
 const userSchema = new Schema<IUser>(
@@ -24,6 +50,12 @@ const userSchema = new Schema<IUser>(
       required: true,
       unique: true,
       trim: true
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      sparse: true
     },
     nickname: {
       type: String,
@@ -35,19 +67,87 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ['user', 'admin'],
+      enum: ['user', 'admin', 'teacher', 'student'],
       default: 'user'
     },
+    permissions: [{
+      type: String,
+      enum: [
+        'manage_users',
+        'manage_questions',
+        'manage_banks',
+        'view_statistics',
+        'export_data',
+        'import_data',
+        'create_practice',
+        'view_answers'
+      ]
+    }],
     password: {
       type: String,
       required: false,
       select: false
     },
-    answerCount: {
-      type: Number,
-      default: 0
+    profile: {
+      realName: String,
+      gender: {
+        type: String,
+        enum: ['male', 'female', 'other']
+      },
+      birthday: Date,
+      location: String,
+      bio: String,
+      education: String,
+      organization: String
     },
-    correctCount: {
+    stats: {
+      answerCount: {
+        type: Number,
+        default: 0
+      },
+      correctCount: {
+        type: Number,
+        default: 0
+      },
+      totalTime: {
+        type: Number,
+        default: 0
+      },
+      lastPracticeAt: Date,
+      favoriteQuestions: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Question'
+      }],
+      wrongQuestions: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Question'
+      }]
+    },
+    preferences: {
+      questionTypes: [String],
+      difficulty: {
+        type: String,
+        enum: ['easy', 'medium', 'hard'],
+        default: 'medium'
+      },
+      dailyGoal: {
+        type: Number,
+        default: 30
+      },
+      emailNotification: {
+        type: Boolean,
+        default: true
+      },
+      pushNotification: {
+        type: Boolean,
+        default: true
+      }
+    },
+    groups: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Group'
+    }],
+    lastLoginAt: Date
   },
   {
     timestamps: true,
@@ -85,8 +185,17 @@ userSchema.methods.comparePassword = async function (candidatePassword: string):
   }
 };
 
-// 创建phone字段的索引，但不是唯一索引
+// 权限检查方法
+userSchema.methods.hasPermission = function (permission: string): boolean {
+  return this.permissions.includes(permission) || this.role === 'admin';
+};
+
+// 索引
 userSchema.index({ phone: 1 }, { sparse: true });
+userSchema.index({ email: 1 }, { sparse: true });
+userSchema.index({ 'profile.realName': 1 });
+userSchema.index({ groups: 1 });
+userSchema.index({ role: 1 });
 
 const User = mongoose.model<IUser>('User', userSchema);
 export { User }; 
